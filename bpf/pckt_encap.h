@@ -83,12 +83,8 @@ encap_v4(struct xdp_md *xdp, struct ctl_value *cval,
   struct ethhdr *new_eth;
   struct ethhdr *old_eth;
   __u32 ip_suffix = bpf_htons(pckt->flow.port16[0]);
-  debugf("ip_suffix:%d pckt->flow.port16[0]:%d %d", &ip_suffix,
-         bpf_htons(pckt->flow.port16[0]), pckt->flow.port16[0]);
   ip_suffix <<= 16;
   ip_suffix ^= pckt->flow.src;
-    debugf("ip_suffix:%pI4 pckt->flow.src:%pI4", &ip_suffix,
-           &pckt->flow.src);
   __u64 csum = 0;
   // ipip encap
   if (bpf_xdp_adjust_head(xdp, 0 - (int)sizeof(struct iphdr))) {
@@ -106,11 +102,6 @@ encap_v4(struct xdp_md *xdp, struct ctl_value *cval,
   memcpy(new_eth->h_source, old_eth->h_dest, 6);
   new_eth->h_proto = BE_ETH_P_IP;
 
-  debugf("ip_suffix A:%pI4", &ip_suffix);
-  ip_suffix = 0xFFFF0000 & ip_suffix;
-  debugf("ip_suffix B:%pI4", &ip_suffix);
-  ip_suffix = (0xFFFF0000 & ip_suffix) | IPIP_V4_PREFIX;
-  debugf("ip_suffix C:%pI4", &ip_suffix);
   create_v4_hdr(iph, pckt->tos, ((0xFFFF0000 & ip_suffix) | IPIP_V4_PREFIX),
                 dst->dst, pkt_bytes, IPPROTO_IPIP);
 
