@@ -142,29 +142,29 @@ test-mac-list:
 test-mac: test-mac-change test-mac-list
 
 init-r:
-	sudo ip a add 192.168.127.80/32 dev lo:1
+	sudo ip a add 192.168.226.80/32 dev lo:1
 	sudo ip link add name ipip4 type ipip external
 	sudo ip link add name ipip6 type ip6tnl external
 	sudo ip link set up dev ipip4
 	sudo ip link set up dev ipip6
-	sudo ip a add dev ipip4 172.16.0.1/10
+	sudo ip a add dev ipip4 172.16.0.1/24
 	sudo ip -6 a add dev ipip6 0100::0/64
-	#echo "1" >/proc/sys/net/ipv4/conf/lo/arp_ignore
-	#echo "2" >/proc/sys/net/ipv4/conf/lo/arp_announce
+	echo "1" >/proc/sys/net/ipv4/conf/lo/arp_ignore
+	echo "2" >/proc/sys/net/ipv4/conf/lo/arp_announce
 	echo "1" >/proc/sys/net/ipv4/conf/all/arp_ignore
 	echo "2" >/proc/sys/net/ipv4/conf/all/arp_announce
 
 init-d:
 	sudo sysctl net.core.bpf_jit_enable=1
-	sudo ip a add 192.168.127.80/32 dev ens33:1
+	sudo ip a add 192.168.226.80/32 dev ens36:1
 
 run-d:
-	./bin/slbd
+	./bin/slbd -default_route_device=ens36
 
 test-c:
-	sudo ./bin/slbc -change_mac 00:0c:29:b0:bf:e7
-	sudo ./bin/slbc -A -t 192.168.127.80:80
-	sudo ./bin/slbc -a -t 192.168.127.80:80 -r 192.168.127.81
+	sudo ./bin/slbc -change_mac 00:50:56:27:dc:b2
+	sudo ./bin/slbc -A -t 192.168.226.80:80
+	sudo ./bin/slbc -a -t 192.168.226.80:80 -r 192.168.226.81
 
 test-app:
 	curl http://192.168.127.80:80
