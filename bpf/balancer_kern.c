@@ -614,14 +614,6 @@ process_packet(struct xdp_md *xdp, __u64 off, bool is_ipv6) {
   vip.port = pckt.flow.port16[1];
   vip.proto = pckt.flow.proto;
 
-  if (vip.port != 20480) {
-    return XDP_PASS;
-  }
-  debugf("-------------------");
-  debugf("vip.ip:%pI4 %d", &vip.vip, vip.vip);
-  debugf("vip.port:%d %d", vip.port, bpf_htons(vip.port));
-  debugf("vip.proto:%d", vip.proto);
-
   vip_info = bpf_map_lookup_elem(&vip_map, &vip);
   if (!vip_info) {
     vip.port = 0;
